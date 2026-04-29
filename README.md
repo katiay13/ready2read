@@ -28,7 +28,7 @@ A Goodreads-inspired desktop application built with Java, JDBC, and MySQL.
    - Copy and paste the contents of `schema.sql` into the query tab
 3. Hit **Ctrl+Shift+Enter** to run the full script
 4. Refresh the Schemas panel to confirm `ready2read` appears
-5. Run the seed file the same way using `seed.sql` (coming soon)
+5. Run the seed file the same way using `seed.sql`
 
 ### Verify it worked
 ```sql
