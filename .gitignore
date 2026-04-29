@@ -1,0 +1,22 @@
+# Compiled Java files
+*.class
+*.jar
+
+# Build folders
+bin/
+out/
+build/
+
+# IDE config files
+.vscode/
+.idea/
+*.iml
+
+# Database credentials / config
+config.properties
+.env
+db.properties
+
+# OS junk
+.DS_Store
+Thumbs.db
