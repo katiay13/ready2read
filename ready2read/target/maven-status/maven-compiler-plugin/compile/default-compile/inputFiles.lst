@@ -1,0 +1,15 @@
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/servlets/admin/AdminCatalogServlet.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/models/User.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/dao/ReadingListDAO.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/models/Review.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/db/DBConnection.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/dao/BookDAO.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/dao/ReviewDAO.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/servlets/RegisterServlet.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/models/Book.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/models/ReadingList.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/servlets/CatalogServlet.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/dao/UserDAO.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/servlets/LogoutServlet.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/servlets/LoginServlet.java
+/Users/katia/github/ready2read/ready2read/src/main/java/com/ready2read/filters/AuthFilter.java

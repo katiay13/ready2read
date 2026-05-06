@@ -1,4 +1,4 @@
-package models;
+package com.ready2read.models;
 
 import java.time.LocalDateTime;
 

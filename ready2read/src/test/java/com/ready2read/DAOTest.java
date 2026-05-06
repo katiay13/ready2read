@@ -1,11 +1,13 @@
-import dao.BookDAO;
-import dao.UserDAO;
-import dao.ReviewDAO;
-import dao.ReadingListDAO;
-import models.Book;
-import models.User;
-import models.Review;
-import models.ReadingList;
+package com.ready2read;
+
+import com.ready2read.dao.BookDAO;
+import com.ready2read.dao.UserDAO;
+import com.ready2read.dao.ReviewDAO;
+import com.ready2read.dao.ReadingListDAO;
+import com.ready2read.models.Book;
+import com.ready2read.models.User;
+import com.ready2read.models.Review;
+import com.ready2read.models.ReadingList;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
-package dao;
+package com.ready2read.dao;
 
-import db.DBConnection;
-import models.Review;
+import com.ready2read.db.DBConnection;
+import com.ready2read.models.Review;
 
 import java.sql.*;
 import java.util.ArrayList;

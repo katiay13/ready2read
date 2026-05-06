@@ -1,7 +1,7 @@
-package dao;
+package com.ready2read.dao;
 
-import db.DBConnection;
-import models.User;
+import com.ready2read.db.DBConnection;
+import com.ready2read.models.User;
 
 import java.sql.*;
 

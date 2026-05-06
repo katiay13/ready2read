@@ -1,0 +1,16 @@
+com/ready2read/filters/AuthFilter.class
+com/ready2read/dao/BookDAO.class
+com/ready2read/servlets/admin/AdminCatalogServlet.class
+com/ready2read/servlets/CatalogServlet.class
+com/ready2read/dao/ReviewDAO.class
+com/ready2read/servlets/RegisterServlet.class
+com/ready2read/servlets/LogoutServlet.class
+com/ready2read/dao/UserDAO.class
+com/ready2read/dao/ReadingListDAO.class
+com/ready2read/servlets/LoginServlet.class
+com/ready2read/models/ReadingList$Status.class
+com/ready2read/models/User.class
+com/ready2read/models/Review.class
+com/ready2read/models/ReadingList.class
+com/ready2read/models/Book.class
+com/ready2read/db/DBConnection.class

@@ -1,7 +1,7 @@
-package db;
+package com.ready2read.db;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,8 +12,15 @@ public class DBConnection {
     private static final Properties props = new Properties();
 
     static {
-        try (FileInputStream fis = new FileInputStream("db.properties")) {
-            props.load(fis);
+        try (InputStream is = DBConnection.class.getClassLoader().getResourceAsStream("db.properties")) {
+            if (is != null) {
+                props.load(is);
+            } else {
+                System.err.println("db.properties not found on classpath — using defaults");
+                props.setProperty("db.url", "jdbc:mysql://localhost:3306/ready2read");
+                props.setProperty("db.user", "root");
+                props.setProperty("db.password", "");
+            }
         } catch (IOException e) {
             throw new RuntimeException("Could not load db.properties: " + e.getMessage());
         }
@@ -25,13 +32,5 @@ public class DBConnection {
             props.getProperty("db.user"),
             props.getProperty("db.password")
         );
-    }
-
-    public static void main(String[] args) {
-        try (Connection conn = getConnection()) {
-            System.out.println("Connected to ready2read database successfully!");
-        } catch (SQLException e) {
-            System.out.println("Connection failed: " + e.getMessage());
-        }
     }
 }
