@@ -9,7 +9,57 @@ import java.util.List;
 
 public class BookDAO {
 
-    public void insert(Book book) throws SQLException {
+    public List<Book> getAllBooks(int page, int pageSize) {
+        List<Book> books = new ArrayList<>();
+        String sql = "SELECT * FROM Books ORDER BY Title LIMIT ? OFFSET ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, pageSize);
+            stmt.setInt(2, (page - 1) * pageSize);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) books.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("getAllBooks failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return books;
+    }
+
+    public List<Book> getBooksByGenre(String genre, int page, int pageSize) {
+        List<Book> books = new ArrayList<>();
+        String sql = "SELECT * FROM Books WHERE Genre = ? ORDER BY Title LIMIT ? OFFSET ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, genre);
+            stmt.setInt(2, pageSize);
+            stmt.setInt(3, (page - 1) * pageSize);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) books.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("getBooksByGenre failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return books;
+    }
+
+    public Book getBookByID(int bookID) {
+        String sql = "SELECT * FROM Books WHERE BookID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, bookID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("getBookByID failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public void addBook(Book book) {
         String sql = "INSERT INTO Books (Title, Author, Genre, PublishedYear, ISBN, Description) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
@@ -21,58 +71,15 @@ public class BookDAO {
             stmt.setString(5, book.getIsbn());
             stmt.setString(6, book.getDescription());
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("addBook failed: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public Book findByID(int bookID) throws SQLException {
-        String sql = "SELECT * FROM Books WHERE BookID = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, bookID);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) return mapRow(rs);
-        }
-        return null;
-    }
-
-    public List<Book> findAll() throws SQLException {
-        List<Book> books = new ArrayList<>();
-        String sql = "SELECT * FROM Books";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) books.add(mapRow(rs));
-        }
-        return books;
-    }
-
-    public List<Book> findByTitle(String title) throws SQLException {
-        List<Book> books = new ArrayList<>();
-        String sql = "SELECT * FROM Books WHERE Title LIKE ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, "%" + title + "%");
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) books.add(mapRow(rs));
-        }
-        return books;
-    }
-
-    public List<Book> findByAuthor(String author) throws SQLException {
-        List<Book> books = new ArrayList<>();
-        String sql = "SELECT * FROM Books WHERE Author LIKE ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, "%" + author + "%");
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) books.add(mapRow(rs));
-        }
-        return books;
-    }
-
-    public void update(Book book) throws SQLException {
-        String sql = "UPDATE Books SET Title = ?, Author = ?, Genre = ?, PublishedYear = ?, ISBN = ?, Description = ? " +
-                     "WHERE BookID = ?";
+    public void updateBook(Book book) {
+        String sql = "UPDATE Books SET Title = ?, Author = ?, Genre = ?, PublishedYear = ?, " +
+                     "ISBN = ?, Description = ? WHERE BookID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, book.getTitle());
@@ -83,16 +90,82 @@ public class BookDAO {
             stmt.setString(6, book.getDescription());
             stmt.setInt(7, book.getBookID());
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("updateBook failed: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public void delete(int bookID) throws SQLException {
+    public void deleteBook(int bookID) {
         String sql = "DELETE FROM Books WHERE BookID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, bookID);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("deleteBook failed: " + e.getMessage());
+            throw new RuntimeException(e);
         }
+    }
+
+    public double getAverageRating(int bookID) {
+        String sql = "SELECT AVG(Rating) FROM Reviews WHERE BookID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, bookID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    double avg = rs.getDouble(1);
+                    return rs.wasNull() ? 0.0 : avg;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("getAverageRating failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return 0.0;
+    }
+
+    public int getTotalBookCount() {
+        String sql = "SELECT COUNT(*) FROM Books";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            System.err.println("getTotalBookCount failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return 0;
+    }
+
+    public int getTotalBookCountByGenre(String genre) {
+        String sql = "SELECT COUNT(*) FROM Books WHERE Genre = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, genre);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("getTotalBookCountByGenre failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return 0;
+    }
+
+    public List<String> getAllGenres() {
+        List<String> genres = new ArrayList<>();
+        String sql = "SELECT DISTINCT Genre FROM Books WHERE Genre IS NOT NULL ORDER BY Genre";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) genres.add(rs.getString("Genre"));
+        } catch (SQLException e) {
+            System.err.println("getAllGenres failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return genres;
     }
 
     private Book mapRow(ResultSet rs) throws SQLException {

@@ -9,58 +9,85 @@ import java.util.List;
 
 public class ReadingListDAO {
 
-    public void insert(ReadingList entry) throws SQLException {
-        String sql = "INSERT INTO ReadingList (UserID, BookID, Status) VALUES (?, ?, ?)";
+    public List<ReadingList> getReadingListByUser(int userID) {
+        List<ReadingList> entries = new ArrayList<>();
+        String sql = "SELECT rl.*, b.Title, b.Author, b.Genre FROM ReadingList rl " +
+                     "JOIN Books b ON rl.BookID = b.BookID " +
+                     "WHERE rl.UserID = ? ORDER BY rl.DateAdded DESC";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, entry.getUserID());
-            stmt.setInt(2, entry.getBookID());
-            stmt.setString(3, entry.getStatus().getValue());
+            stmt.setInt(1, userID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    ReadingList entry = mapRow(rs);
+                    entry.setBookTitle(rs.getString("Title"));
+                    entry.setBookAuthor(rs.getString("Author"));
+                    entry.setBookGenre(rs.getString("Genre"));
+                    entries.add(entry);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("getReadingListByUser failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return entries;
+    }
+
+    public ReadingList getEntry(int userID, int bookID) {
+        String sql = "SELECT * FROM ReadingList WHERE UserID = ? AND BookID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            stmt.setInt(2, bookID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("getEntry failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public void addEntry(int userID, int bookID, String status) {
+        String sql = "INSERT INTO ReadingList (UserID, BookID, Status, DateAdded) " +
+                     "VALUES (?, ?, ?, NOW())";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            stmt.setInt(2, bookID);
+            stmt.setString(3, status);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("addEntry failed: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public List<ReadingList> findByUser(int userID) throws SQLException {
-        List<ReadingList> entries = new ArrayList<>();
-        String sql = "SELECT * FROM ReadingList WHERE UserID = ?";
+    public void updateStatus(int entryID, String status) {
+        String sql = "finished".equals(status)
+            ? "UPDATE ReadingList SET Status = ?, DateFinished = NOW() WHERE EntryID = ?"
+            : "UPDATE ReadingList SET Status = ?, DateFinished = NULL WHERE EntryID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, userID);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) entries.add(mapRow(rs));
-        }
-        return entries;
-    }
-
-    public List<ReadingList> findByUserAndStatus(int userID, ReadingList.Status status) throws SQLException {
-        List<ReadingList> entries = new ArrayList<>();
-        String sql = "SELECT * FROM ReadingList WHERE UserID = ? AND Status = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, userID);
-            stmt.setString(2, status.getValue());
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) entries.add(mapRow(rs));
-        }
-        return entries;
-    }
-
-    public void updateStatus(int entryID, ReadingList.Status status) throws SQLException {
-        String sql = "UPDATE ReadingList SET Status = ? WHERE EntryID = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, status.getValue());
+            stmt.setString(1, status);
             stmt.setInt(2, entryID);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("updateStatus failed: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public void delete(int entryID) throws SQLException {
+    public void removeEntry(int entryID) {
         String sql = "DELETE FROM ReadingList WHERE EntryID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, entryID);
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("removeEntry failed: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
@@ -73,7 +100,6 @@ public class ReadingListDAO {
                 break;
             }
         }
-
         Timestamp dateFinished = rs.getTimestamp("DateFinished");
         return new ReadingList(
             rs.getInt("EntryID"),

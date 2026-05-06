@@ -35,7 +35,7 @@ A Goodreads-inspired desktop application built with Java, JDBC, and MySQL.
 USE ready2read;
 SHOW TABLES;
 ```
-You should see all 5 tables: Users, Authors, Books, Reviews, ReadingList.
+You should see all 4 tables: Users, Books, Reviews, ReadingList.
 
 ## JDBC Setup
 

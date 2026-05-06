@@ -11,6 +11,8 @@ public class Review {
     private String reviewText;
     private LocalDateTime dateCreated;
     private LocalDateTime dateModified;
+    private String username;
+    private String bookTitle;
 
     public Review(int reviewID, int userID, int bookID, int rating,
                   String reviewText, LocalDateTime dateCreated, LocalDateTime dateModified) {
@@ -30,8 +32,12 @@ public class Review {
     public String getReviewText()               { return reviewText; }
     public LocalDateTime getDateCreated()       { return dateCreated; }
     public LocalDateTime getDateModified()      { return dateModified; }
+    public String getUsername()                 { return username; }
+    public String getBookTitle()                { return bookTitle; }
 
     public void setRating(int rating)               { this.rating       = rating; }
     public void setReviewText(String reviewText)     { this.reviewText   = reviewText; }
     public void setDateModified(LocalDateTime date)  { this.dateModified = date; }
+    public void setUsername(String username)         { this.username     = username; }
+    public void setBookTitle(String bookTitle)       { this.bookTitle    = bookTitle; }
 }

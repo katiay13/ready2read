@@ -21,6 +21,9 @@ public class ReadingList {
     private Status status;
     private LocalDateTime dateAdded;
     private LocalDateTime dateFinished;
+    private String bookTitle;
+    private String bookAuthor;
+    private String bookGenre;
 
     public ReadingList(int entryID, int userID, int bookID, Status status,
                        LocalDateTime dateAdded, LocalDateTime dateFinished) {
@@ -38,7 +41,13 @@ public class ReadingList {
     public Status getStatus()                { return status; }
     public LocalDateTime getDateAdded()      { return dateAdded; }
     public LocalDateTime getDateFinished()   { return dateFinished; }
+    public String getBookTitle()             { return bookTitle; }
+    public String getBookAuthor()            { return bookAuthor; }
+    public String getBookGenre()             { return bookGenre; }
 
-    public void setStatus(Status status)                  { this.status       = status; }
+    public void setStatus(Status status)                    { this.status       = status; }
     public void setDateFinished(LocalDateTime dateFinished) { this.dateFinished = dateFinished; }
+    public void setBookTitle(String bookTitle)              { this.bookTitle    = bookTitle; }
+    public void setBookAuthor(String bookAuthor)            { this.bookAuthor   = bookAuthor; }
+    public void setBookGenre(String bookGenre)              { this.bookGenre    = bookGenre; }
 }
