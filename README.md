@@ -1,78 +1,116 @@
 # Ready 2 Read — Book Review & Reading Tracker
 
-A Goodreads-inspired desktop application built with Java, JDBC, and MySQL.
+A Goodreads-inspired web application built with Java Servlets, JSP, and MySQL.
 
 ## Team
 - Katia Yarkov (018141825)
 - Geeta Renavikar (017035109)
 
 ## Tech Stack
-- Java
-- JDBC
-- MySQL / MySQL Workbench
+- Java 17
+- Jakarta Servlet API 6.0 + JSP/JSTL
+- JDBC + MySQL
+- Maven (WAR packaging)
+- Apache Tomcat (runtime)
 
-## Database Setup
+## Features
+- User registration and login with session-based auth
+- Book catalog with genre filtering and pagination
+- Reading list management (add, update status, remove)
+- Book reviews (add, edit, delete) with average ratings
+- User profile page
+- Admin panel for book management (add, edit, delete)
 
-### Schema
-![ER Diagram](docs/er_diagram.png)
+## Running with Docker (easiest)
 
 ### Prerequisites
-- MySQL installed and running
-- MySQL Workbench (optional but recommended)
+- Docker Desktop installed and running
 
-### Steps
-
-1. Open MySQL Workbench and connect to your local instance
-2. Open a new query tab and run the schema file:
-   - Go to **File → Open SQL Script** and select `schema.sql`, or
-   - Copy and paste the contents of `schema.sql` into the query tab
-3. Hit **Ctrl+Shift+Enter** to run the full script
-4. Refresh the Schemas panel to confirm `ready2read` appears
-5. Run the seed file the same way using `seed.sql`
-
-### Verify it worked
-```sql
-USE ready2read;
-SHOW TABLES;
+```bash
+docker compose up --build
 ```
-You should see all 4 tables: Users, Books, Reviews, ReadingList.
 
-## JDBC Setup
+Docker will build the WAR, start MySQL, run `schema.sql` and `seed.sql` automatically, and wait for the database to be healthy before starting the app.
+
+Open `http://localhost:8080` once both containers are up.
+
+```bash
+docker compose down      # stop and remove containers
+docker compose down -v   # also wipe the database volume (fresh start)
+```
+
+---
+
+## Running Manually
 
 ### Prerequisites
-- Java JDK installed
-- MySQL running locally with the `ready2read` database set up (see Database Setup above)
+- Java 17+
+- Maven 3.6+
+- MySQL installed and running
+- Apache Tomcat 10+
 
-### Steps
+### Database
 
-1. **Download the MySQL JDBC driver**
-   - Go to https://dev.mysql.com/downloads/connector/j/
-   - Select **Platform Independent**, download the `.zip`
-   - Unzip it and copy `mysql-connector-j-x.x.x.jar` into the `lib/` folder
+```bash
+mysql -u root -p < ready2read/schema.sql
+mysql -u root -p < ready2read/seed.sql
+```
 
-2. **Configure your database credentials**
-   - Copy the example config file:
-     ```
-     cp db.properties.example db.properties
-     ```
-   - Open `db.properties` and fill in your MySQL username and password:
-     ```
-     db.url=jdbc:mysql://localhost:3306/ready2read
-     db.user=your_mysql_username
-     db.password=your_mysql_password
-     ```
-   - `db.properties` is gitignored and will never be committed
+Schema reference: ![ER Diagram](docs/er_diagram.png)
 
-3. **Compile the project**
+### App
+
+1. **Configure your database credentials** — create `ready2read/src/main/resources/db.properties`:
    ```
-   javac -cp lib/mysql-connector-j-x.x.x.jar src/db/DBConnection.java -d out/
+   db.url=jdbc:mysql://localhost:3306/ready2read
+   db.user=your_mysql_username
+   db.password=your_mysql_password
+   ```
+   This file is gitignored and will never be committed.
+
+2. **Build the WAR**
+   ```
+   cd ready2read
+   mvn clean package
    ```
 
-4. **Test the connection**
+3. **Deploy to Tomcat** — copy `target/ready2read.war` to your Tomcat `webapps/` directory, then:
    ```
-   java -cp out:lib/mysql-connector-j-x.x.x.jar db.DBConnection
+   $CATALINA_HOME/bin/startup.sh
    ```
-   You should see: `Connected to ready2read database successfully!`
+
+4. Open `http://localhost:8080/ready2read`
 
 ## Project Structure
-(to be updated as the project develops)
+
+```
+ready2read/
+├── schema.sql                   # DDL — creates all tables
+├── seed.sql                     # Sample data
+└── src/main/
+    ├── java/com/ready2read/
+    │   ├── dao/                 # Data access (BookDAO, ReviewDAO, ReadingListDAO, UserDAO)
+    │   ├── db/                  # DBConnection helper
+    │   ├── filters/             # AuthFilter (session guard)
+    │   ├── models/              # POJOs (Book, Review, ReadingList, User)
+    │   └── servlets/
+    │       ├── admin/           # AdminCatalogServlet, AdminBookAdd/Edit/DeleteServlet
+    │       ├── CatalogServlet
+    │       ├── LoginServlet / LogoutServlet / RegisterServlet
+    │       ├── MyReviewsServlet
+    │       ├── ProfileServlet
+    │       ├── ReadingList*Servlet
+    │       └── Review*Servlet
+    ├── resources/
+    │   └── db.properties        # DB credentials (gitignored)
+    └── webapp/
+        ├── index.jsp
+        └── WEB-INF/jsp/
+            ├── admin/           # Admin views
+            ├── common/          # Shared sidebar fragments
+            ├── catalog.jsp
+            ├── login.jsp / register.jsp
+            ├── myReviews.jsp
+            ├── profile.jsp
+            └── readingList.jsp
+```

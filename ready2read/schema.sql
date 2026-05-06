@@ -22,7 +22,7 @@ CREATE TABLE Books (
     Title         VARCHAR(255) NOT NULL,
     Author        VARCHAR(255) NOT NULL,
     Genre         VARCHAR(100),
-    PublishedYear YEAR,
+    PublishedYear SMALLINT,
     ISBN          VARCHAR(20)  UNIQUE,
     Description   TEXT
 );

@@ -63,6 +63,21 @@ public class UserDAO {
         }
     }
 
+    public User getUserByID(int userID) {
+        String sql = "SELECT * FROM Users WHERE UserID = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("getUserByID failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
     public boolean usernameExists(String username) {
         String sql = "SELECT COUNT(*) FROM Users WHERE Username = ?";
         try (Connection conn = DBConnection.getConnection();

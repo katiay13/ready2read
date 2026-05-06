@@ -15,18 +15,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@WebServlet("/catalog")
-public class CatalogServlet extends HttpServlet {
-
-    private static final int PAGE_SIZE = 18;
+@WebServlet("/reading-list")
+public class ReadingListServlet extends HttpServlet {
 
     private final BookDAO bookDAO = new BookDAO();
-    private final ReviewDAO reviewDAO = new ReviewDAO();
     private final ReadingListDAO readingListDAO = new ReadingListDAO();
+    private final ReviewDAO reviewDAO = new ReviewDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -38,14 +34,9 @@ public class CatalogServlet extends HttpServlet {
             return;
         }
 
-        int page = 1;
-        try {
-            String p = req.getParameter("page");
-            if (p != null) page = Integer.parseInt(p);
-        } catch (NumberFormatException ignored) {}
+        int userID = (Integer) session.getAttribute("userID");
 
-        String genre = req.getParameter("genre");
-        if (genre != null && genre.trim().isEmpty()) genre = null;
+        List<ReadingList> entries = readingListDAO.getReadingListByUser(userID);
 
         int selectedBookID = 0;
         try {
@@ -53,36 +44,9 @@ public class CatalogServlet extends HttpServlet {
             if (s != null) selectedBookID = Integer.parseInt(s);
         } catch (NumberFormatException ignored) {}
 
-        Integer userID = (Integer) session.getAttribute("userID");
-
-        List<Book> books;
-        int totalCount;
-        if (genre == null) {
-            books = bookDAO.getAllBooks(page, PAGE_SIZE);
-            totalCount = bookDAO.getTotalBookCount();
-        } else {
-            books = bookDAO.getBooksByGenre(genre, page, PAGE_SIZE);
-            totalCount = bookDAO.getTotalBookCountByGenre(genre);
-        }
-
-        int totalPages = (int) Math.ceil((double) totalCount / PAGE_SIZE);
-        if (totalPages < 1) totalPages = 1;
-
-        Map<Integer, Double> bookRatings = new HashMap<>();
-        for (Book book : books) {
-            bookRatings.put(book.getBookID(), bookDAO.getAverageRating(book.getBookID()));
-        }
-
-        List<String> genres = bookDAO.getAllGenres();
-
-        req.setAttribute("books", books);
-        req.setAttribute("bookRatings", bookRatings);
-        req.setAttribute("genres", genres);
-        req.setAttribute("currentPage", page);
-        req.setAttribute("totalPages", totalPages);
-        req.setAttribute("selectedGenre", genre);
+        req.setAttribute("entries", entries);
         req.setAttribute("selectedBookID", selectedBookID);
-        req.setAttribute("activePage", "catalog");
+        req.setAttribute("activePage", "reading-list");
 
         if (selectedBookID > 0) {
             Book selectedBook = bookDAO.getBookByID(selectedBookID);
@@ -98,6 +62,6 @@ public class CatalogServlet extends HttpServlet {
             req.setAttribute("userReview", userReview);
         }
 
-        req.getRequestDispatcher("/WEB-INF/jsp/catalog.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/jsp/readingList.jsp").forward(req, resp);
     }
 }

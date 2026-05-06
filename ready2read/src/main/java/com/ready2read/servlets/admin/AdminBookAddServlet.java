@@ -1,0 +1,59 @@
+package com.ready2read.servlets.admin;
+
+import com.ready2read.dao.BookDAO;
+import com.ready2read.models.Book;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
+
+@WebServlet("/admin/books/add")
+public class AdminBookAddServlet extends HttpServlet {
+
+    private final BookDAO bookDAO = new BookDAO();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        HttpSession session = req.getSession(false);
+        if (session == null || !"admin".equals(session.getAttribute("role"))) {
+            resp.sendRedirect(req.getContextPath() + "/catalog");
+            return;
+        }
+
+        String title = req.getParameter("title");
+        String author = req.getParameter("author");
+        String genre = req.getParameter("genre");
+        int publishedYear = 0;
+        try {
+            String y = req.getParameter("publishedYear");
+            if (y != null && !y.trim().isEmpty()) publishedYear = Integer.parseInt(y.trim());
+        } catch (NumberFormatException ignored) {}
+        String isbn = req.getParameter("isbn");
+        String description = req.getParameter("description");
+        String currentPage = req.getParameter("currentPage");
+        if (currentPage == null || currentPage.trim().isEmpty()) currentPage = "1";
+
+        if (title == null || title.trim().isEmpty() || author == null || author.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() +
+                    "/admin/catalog?action=add&error=Title+and+author+are+required");
+            return;
+        }
+
+        Book book = new Book(0, title.trim(), author.trim(),
+                genre != null ? genre.trim() : null,
+                publishedYear,
+                isbn != null ? isbn.trim() : null,
+                description != null ? description.trim() : null);
+        bookDAO.addBook(book);
+
+        resp.sendRedirect(req.getContextPath() +
+                "/admin/catalog?page=" + currentPage + "&success=Book+added+successfully");
+    }
+}

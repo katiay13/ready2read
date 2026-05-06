@@ -1,0 +1,5 @@
+ready2read/target/
+ready2read/src/main/resources/db.properties
+out/
+lib/
+*.war

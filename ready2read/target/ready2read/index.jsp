@@ -57,6 +57,13 @@
     <div class="container">
         <h1>Ready 2 Read</h1>
         <p>Track your reading. Share your reviews.</p>
+        <% if ("true".equals(request.getParameter("deleted"))) { %>
+        <div style="background:#e8f5e9; color:#2e6b3e; border:1px solid #c3e6cb;
+                    border-radius:4px; padding:0.75rem 1.25rem; margin-bottom:1.25rem;
+                    font-size:0.95rem;">
+            Your account has been deleted. We hope to see you again!
+        </div>
+        <% } %>
         <a href="${pageContext.request.contextPath}/login" class="btn btn-primary">Sign In</a>
         <a href="${pageContext.request.contextPath}/register" class="btn btn-secondary">Register</a>
     </div>

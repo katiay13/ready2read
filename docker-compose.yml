@@ -1,0 +1,28 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ready2read
+      MYSQL_USER: ready2read
+      MYSQL_PASSWORD: ready2read
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./ready2read/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./ready2read/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "ready2read", "-pready2read"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "9090:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

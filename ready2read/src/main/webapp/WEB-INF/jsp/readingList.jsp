@@ -11,7 +11,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Catalog — Ready 2 Read</title>
+    <title>My Reading List — Ready 2 Read</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
@@ -20,92 +20,49 @@
 
 <div class="main-content">
 
-    <!-- ===== CATALOG AREA ===== -->
+    <!-- ===== READING LIST AREA ===== -->
     <div class="catalog-area">
-        <h2 class="page-title">Catalog</h2>
+        <h2 class="page-title">My Reading List</h2>
 
-        <!-- Genre Filter -->
-        <div class="genre-filter">
-            <c:url value="/catalog" var="allUrl">
-                <c:param name="page" value="1"/>
-            </c:url>
-            <a href="${allUrl}" class="genre-btn${empty selectedGenre ? ' active' : ''}">All</a>
-
-            <c:forEach var="g" items="${genres}">
-                <c:url value="/catalog" var="genreUrl">
-                    <c:param name="page" value="1"/>
-                    <c:param name="genre" value="${g}"/>
-                </c:url>
-                <a href="${genreUrl}"
-                   class="genre-btn${selectedGenre == g ? ' active' : ''}">${g}</a>
-            </c:forEach>
-        </div>
-
-        <!-- Book Grid -->
-        <div class="book-grid">
-            <c:forEach var="book" items="${books}">
-                <c:url value="/catalog" var="bookUrl">
-                    <c:param name="page" value="${currentPage}"/>
-                    <c:if test="${not empty selectedGenre}">
-                        <c:param name="genre" value="${selectedGenre}"/>
-                    </c:if>
-                    <c:param name="selectedBookID" value="${book.bookID}"/>
-                </c:url>
-                <a href="${bookUrl}"
-                   class="book-card${selectedBookID == book.bookID ? ' selected' : ''}">
-                    <p class="book-card-title">${book.title}</p>
-                    <p class="book-card-author">${book.author}</p>
-                    <p class="book-card-genre">${book.genre}</p>
-                    <c:set var="r" value="${bookRatings[book.bookID]}"/>
-                    <c:if test="${r > 0}">
-                        <p class="book-card-rating">
-                            <c:forEach var="i" begin="1" end="5">
+        <c:choose>
+            <c:when test="${empty entries}">
+                <p class="empty-list-msg">
+                    Your reading list is empty.
+                    <a href="${pageContext.request.contextPath}/catalog">Browse the catalog</a>
+                    to add books!
+                </p>
+            </c:when>
+            <c:otherwise>
+                <div class="reading-list-entries">
+                    <c:forEach var="entry" items="${entries}">
+                        <c:url value="/reading-list" var="entryUrl">
+                            <c:param name="selectedBookID" value="${entry.bookID}"/>
+                        </c:url>
+                        <a href="${entryUrl}"
+                           class="reading-list-row${selectedBookID == entry.bookID ? ' selected' : ''}">
+                            <div class="reading-list-row-info">
+                                <p class="book-card-title">${entry.bookTitle}</p>
+                                <p class="book-card-author">${entry.bookAuthor}</p>
+                            </div>
+                            <div class="reading-list-row-meta">
                                 <c:choose>
-                                    <c:when test="${i <= r}">&#9733;</c:when>
-                                    <c:otherwise>&#9734;</c:otherwise>
+                                    <c:when test="${entry.status.value == 'want_to_read'}">
+                                        <span class="badge badge-want">Want to Read</span>
+                                    </c:when>
+                                    <c:when test="${entry.status.value == 'currently_reading'}">
+                                        <span class="badge badge-reading">Currently Reading</span>
+                                    </c:when>
+                                    <c:when test="${entry.status.value == 'finished'}">
+                                        <span class="badge badge-finished">Finished</span>
+                                    </c:when>
                                 </c:choose>
-                            </c:forEach>
-                            <fmt:formatNumber value="${r}" minFractionDigits="1" maxFractionDigits="1"/>
-                        </p>
-                    </c:if>
-                </a>
-            </c:forEach>
-        </div>
-
-        <!-- Pagination -->
-        <div class="pagination">
-            <c:choose>
-                <c:when test="${currentPage > 1}">
-                    <c:url value="/catalog" var="prevUrl">
-                        <c:param name="page" value="${currentPage - 1}"/>
-                        <c:if test="${not empty selectedGenre}">
-                            <c:param name="genre" value="${selectedGenre}"/>
-                        </c:if>
-                    </c:url>
-                    <a href="${prevUrl}">&larr; Previous</a>
-                </c:when>
-                <c:otherwise>
-                    <span class="disabled">&larr; Previous</span>
-                </c:otherwise>
-            </c:choose>
-
-            <span class="pagination-label">Page ${currentPage} of ${totalPages}</span>
-
-            <c:choose>
-                <c:when test="${currentPage < totalPages}">
-                    <c:url value="/catalog" var="nextUrl">
-                        <c:param name="page" value="${currentPage + 1}"/>
-                        <c:if test="${not empty selectedGenre}">
-                            <c:param name="genre" value="${selectedGenre}"/>
-                        </c:if>
-                    </c:url>
-                    <a href="${nextUrl}">Next &rarr;</a>
-                </c:when>
-                <c:otherwise>
-                    <span class="disabled">Next &rarr;</span>
-                </c:otherwise>
-            </c:choose>
-        </div>
+                                <span class="reading-list-date">${entry.dateAdded.toLocalDate()}</span>
+                            </div>
+                        </a>
+                    </c:forEach>
+                </div>
+            </c:otherwise>
+        </c:choose>
     </div>
 
     <!-- ===== DETAIL PANEL ===== -->
@@ -152,9 +109,11 @@
                 <c:when test="${readingListEntry == null}">
                     <form method="post"
                           action="${pageContext.request.contextPath}/reading-list/add">
-                        <input type="hidden" name="bookID"        value="${selectedBook.bookID}">
-                        <input type="hidden" name="currentPage"   value="${currentPage}">
-                        <input type="hidden" name="selectedGenre" value="${selectedGenre}">
+                        <input type="hidden" name="bookID"         value="${selectedBook.bookID}">
+                        <input type="hidden" name="currentPage"    value="1">
+                        <input type="hidden" name="selectedGenre"  value="">
+                        <input type="hidden" name="selectedBookID" value="${selectedBook.bookID}">
+                        <input type="hidden" name="source"         value="readingList">
                         <div class="form-group">
                             <label for="addStatus">Status</label>
                             <select name="status" id="addStatus">
@@ -184,10 +143,11 @@
                     <form method="post"
                           action="${pageContext.request.contextPath}/reading-list/update"
                           style="margin-bottom:0.5rem;">
-                        <input type="hidden" name="entryID"       value="${readingListEntry.entryID}">
-                        <input type="hidden" name="currentPage"   value="${currentPage}">
-                        <input type="hidden" name="selectedGenre" value="${selectedGenre}">
+                        <input type="hidden" name="entryID"        value="${readingListEntry.entryID}">
+                        <input type="hidden" name="currentPage"    value="1">
+                        <input type="hidden" name="selectedGenre"  value="">
                         <input type="hidden" name="selectedBookID" value="${selectedBook.bookID}">
+                        <input type="hidden" name="source"         value="readingList">
                         <div class="form-group">
                             <label for="updateStatus">Update Status</label>
                             <select name="status" id="updateStatus">
@@ -209,8 +169,9 @@
                           action="${pageContext.request.contextPath}/reading-list/remove"
                           onsubmit="return confirm('Remove this book from your reading list?')">
                         <input type="hidden" name="entryID"       value="${readingListEntry.entryID}">
-                        <input type="hidden" name="currentPage"   value="${currentPage}">
-                        <input type="hidden" name="selectedGenre" value="${selectedGenre}">
+                        <input type="hidden" name="currentPage"   value="1">
+                        <input type="hidden" name="selectedGenre" value="">
+                        <input type="hidden" name="source"        value="readingList">
                         <button type="submit" class="btn btn-danger btn-sm">Remove from Reading List</button>
                     </form>
                 </c:otherwise>
@@ -224,7 +185,6 @@
             <c:forEach var="review" items="${bookReviews}">
                 <c:choose>
                     <c:when test="${review.userID == sessionScope.userID}">
-                        <!-- Current user's review — highlighted with edit/delete -->
                         <div class="review-card user-review">
                             <div class="review-meta">
                                 <span class="review-username">${review.username} (You)</span>
@@ -249,9 +209,11 @@
                                       action="${pageContext.request.contextPath}/reviews/delete"
                                       onsubmit="return confirm('Delete your review?')"
                                       style="display:inline;">
-                                    <input type="hidden" name="reviewID"      value="${review.reviewID}">
-                                    <input type="hidden" name="currentPage"   value="${currentPage}">
-                                    <input type="hidden" name="selectedGenre" value="${selectedGenre}">
+                                    <input type="hidden" name="reviewID"       value="${review.reviewID}">
+                                    <input type="hidden" name="currentPage"    value="1">
+                                    <input type="hidden" name="selectedGenre"  value="">
+                                    <input type="hidden" name="selectedBookID" value="${selectedBook.bookID}">
+                                    <input type="hidden" name="source"         value="readingList">
                                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                 </form>
                             </div>
@@ -259,9 +221,10 @@
                                 <form method="post"
                                       action="${pageContext.request.contextPath}/reviews/update">
                                     <input type="hidden" name="reviewID"       value="${review.reviewID}">
-                                    <input type="hidden" name="currentPage"    value="${currentPage}">
-                                    <input type="hidden" name="selectedGenre"  value="${selectedGenre}">
+                                    <input type="hidden" name="currentPage"    value="1">
+                                    <input type="hidden" name="selectedGenre"  value="">
                                     <input type="hidden" name="selectedBookID" value="${selectedBook.bookID}">
+                                    <input type="hidden" name="source"         value="readingList">
                                     <div class="form-group">
                                         <label for="editRating-${review.reviewID}">Rating</label>
                                         <select name="rating" id="editRating-${review.reviewID}">
@@ -282,7 +245,6 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <!-- Other users' reviews -->
                         <div class="review-card">
                             <div class="review-meta">
                                 <span class="review-username">${review.username}</span>
@@ -305,15 +267,15 @@
                 </c:choose>
             </c:forEach>
 
-            <!-- Add review form (only if user hasn't reviewed this book) -->
             <c:if test="${userReview == null}">
                 <h4 style="margin:0.75rem 0 0.5rem; font-size:0.9rem;">Add Your Review</h4>
                 <form method="post"
                       action="${pageContext.request.contextPath}/reviews/add">
-                    <input type="hidden" name="bookID"        value="${selectedBook.bookID}">
-                    <input type="hidden" name="currentPage"   value="${currentPage}">
-                    <input type="hidden" name="selectedGenre" value="${selectedGenre}">
+                    <input type="hidden" name="bookID"         value="${selectedBook.bookID}">
+                    <input type="hidden" name="currentPage"    value="1">
+                    <input type="hidden" name="selectedGenre"  value="">
                     <input type="hidden" name="selectedBookID" value="${selectedBook.bookID}">
+                    <input type="hidden" name="source"         value="readingList">
                     <div class="form-group">
                         <label for="addRating">Rating</label>
                         <select name="rating" id="addRating">
