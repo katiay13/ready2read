@@ -5,9 +5,9 @@ import java.time.LocalDateTime;
 public class ReadingList {
 
     public enum Status {
-        WANT_TO_READ("Want to Read"),
-        CURRENTLY_READING("Currently Reading"),
-        FINISHED("Finished");
+        WANT_TO_READ("want_to_read"),
+        CURRENTLY_READING("currently_reading"),
+        FINISHED("finished");
 
         private final String value;
 

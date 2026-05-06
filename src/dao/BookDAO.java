@@ -10,12 +10,12 @@ import java.util.List;
 public class BookDAO {
 
     public void insert(Book book) throws SQLException {
-        String sql = "INSERT INTO Books (Title, AuthorID, Genre, PublishedYear, ISBN, Description) " +
+        String sql = "INSERT INTO Books (Title, Author, Genre, PublishedYear, ISBN, Description) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, book.getTitle());
-            stmt.setInt(2, book.getAuthorID());
+            stmt.setString(2, book.getAuthor());
             stmt.setString(3, book.getGenre());
             stmt.setInt(4, book.getPublishedYear());
             stmt.setString(5, book.getIsbn());
@@ -58,12 +58,12 @@ public class BookDAO {
         return books;
     }
 
-    public List<Book> findByAuthor(int authorID) throws SQLException {
+    public List<Book> findByAuthor(String author) throws SQLException {
         List<Book> books = new ArrayList<>();
-        String sql = "SELECT * FROM Books WHERE AuthorID = ?";
+        String sql = "SELECT * FROM Books WHERE Author LIKE ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, authorID);
+            stmt.setString(1, "%" + author + "%");
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) books.add(mapRow(rs));
         }
@@ -71,16 +71,17 @@ public class BookDAO {
     }
 
     public void update(Book book) throws SQLException {
-        String sql = "UPDATE Books SET Title = ?, Genre = ?, PublishedYear = ?, ISBN = ?, Description = ? " +
+        String sql = "UPDATE Books SET Title = ?, Author = ?, Genre = ?, PublishedYear = ?, ISBN = ?, Description = ? " +
                      "WHERE BookID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, book.getTitle());
-            stmt.setString(2, book.getGenre());
-            stmt.setInt(3, book.getPublishedYear());
-            stmt.setString(4, book.getIsbn());
-            stmt.setString(5, book.getDescription());
-            stmt.setInt(6, book.getBookID());
+            stmt.setString(2, book.getAuthor());
+            stmt.setString(3, book.getGenre());
+            stmt.setInt(4, book.getPublishedYear());
+            stmt.setString(5, book.getIsbn());
+            stmt.setString(6, book.getDescription());
+            stmt.setInt(7, book.getBookID());
             stmt.executeUpdate();
         }
     }
@@ -98,7 +99,7 @@ public class BookDAO {
         return new Book(
             rs.getInt("BookID"),
             rs.getString("Title"),
-            rs.getInt("AuthorID"),
+            rs.getString("Author"),
             rs.getString("Genre"),
             rs.getInt("PublishedYear"),
             rs.getString("ISBN"),

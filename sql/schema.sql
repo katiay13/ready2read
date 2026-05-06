@@ -6,28 +6,20 @@ CREATE TABLE Users (
     Username    VARCHAR(50)  NOT NULL UNIQUE,
     Email       VARCHAR(100) NOT NULL UNIQUE,
     Password    VARCHAR(255) NOT NULL,
+    Role        ENUM('admin', 'user') NOT NULL DEFAULT 'user',
     JoinDate    DATE         NOT NULL DEFAULT (CURRENT_DATE),
     ProfileBio  TEXT,
     AvatarURL   VARCHAR(255)
 );
 
-CREATE TABLE Authors (
-    AuthorID    INT          AUTO_INCREMENT PRIMARY KEY,
-    FirstName   VARCHAR(100) NOT NULL,
-    LastName    VARCHAR(100) NOT NULL,
-    Bio         TEXT
-);
-
 CREATE TABLE Books (
     BookID        INT          AUTO_INCREMENT PRIMARY KEY,
     Title         VARCHAR(255) NOT NULL,
-    AuthorID      INT          NOT NULL,
+    Author        VARCHAR(255) NOT NULL,
     Genre         VARCHAR(100),
     PublishedYear YEAR,
     ISBN          VARCHAR(20)  UNIQUE,
-    Description   TEXT,
-    FOREIGN KEY (AuthorID) REFERENCES Authors(AuthorID)
-        ON DELETE RESTRICT ON UPDATE CASCADE
+    Description   TEXT
 );
 
 CREATE TABLE Reviews (
@@ -49,8 +41,8 @@ CREATE TABLE ReadingList (
     EntryID      INT      AUTO_INCREMENT PRIMARY KEY,
     UserID       INT      NOT NULL,
     BookID       INT      NOT NULL,
-    Status       ENUM('Want to Read', 'Currently Reading', 'Finished')
-                          NOT NULL DEFAULT 'Want to Read',
+    Status       ENUM('want_to_read', 'currently_reading', 'finished')
+                          NOT NULL DEFAULT 'want_to_read',
     DateAdded    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     DateFinished DATETIME,
     UNIQUE (UserID, BookID),

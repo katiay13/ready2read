@@ -11,16 +11,17 @@ import java.util.List;
 public class UserDAO {
 
     public void insert(User user) throws SQLException {
-        String sql = "INSERT INTO Users (Username, Email, Password, JoinDate, ProfileBio, AvatarURL) " +
-                     "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Users (Username, Email, Password, Role, JoinDate, ProfileBio, AvatarURL) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getUsername());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
-            stmt.setDate(4, Date.valueOf(user.getJoinDate()));
-            stmt.setString(5, user.getProfileBio());
-            stmt.setString(6, user.getAvatarURL());
+            stmt.setString(4, user.getRole());
+            stmt.setDate(5, Date.valueOf(user.getJoinDate()));
+            stmt.setString(6, user.getProfileBio());
+            stmt.setString(7, user.getAvatarURL());
             stmt.executeUpdate();
         }
     }
@@ -41,6 +42,18 @@ public class UserDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) return mapRow(rs);
+        }
+        return null;
+    }
+
+    public User login(String username, String password) throws SQLException {
+        String sql = "SELECT * FROM Users WHERE Username = ? AND Password = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) return mapRow(rs);
         }
@@ -85,6 +98,7 @@ public class UserDAO {
             rs.getString("Username"),
             rs.getString("Email"),
             rs.getString("Password"),
+            rs.getString("Role"),
             rs.getDate("JoinDate").toLocalDate(),
             rs.getString("ProfileBio"),
             rs.getString("AvatarURL")
