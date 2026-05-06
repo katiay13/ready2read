@@ -21,7 +21,7 @@ A Goodreads-inspired web application built with Java Servlets, JSP, and MySQL.
 - User profile page
 - Admin panel for book management (add, edit, delete)
 
-## Running with Docker (easiest)
+## Running with Docker
 
 ### Prerequisites
 - Docker Desktop installed and running
