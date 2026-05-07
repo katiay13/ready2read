@@ -446,3 +446,22 @@ textarea { resize: vertical; min-height: 80px; }
     font-size: 0.75rem;
     color: #999;
 }
+/* ===== SEARCH BAR ===== */
+.catalog-search {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.catalog-search-input {
+    flex: 1;
+}
+
+/* Make search button smaller */
+.catalog-search .btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    height: 36px;
+}

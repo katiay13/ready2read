@@ -22,10 +22,31 @@
 
     <!-- ===== CATALOG AREA ===== -->
     <div class="catalog-area">
-        <h2 class="page-title">Catalog</h2>
+<h2 class="page-title">Catalog</h2>
 
-        <!-- Genre Filter -->
-        <div class="genre-filter">
+<!-- Search Bar -->
+<form method="get" action="${pageContext.request.contextPath}/catalog" class="catalog-search">
+    <input type="hidden" name="page" value="1">
+
+    <c:if test="${not empty selectedGenre}">
+        <input type="hidden" name="genre" value="${selectedGenre}">
+    </c:if>
+
+    <input type="text"
+           name="query"
+           value="${query}"
+           placeholder="Search by title, author, or ISBN..."
+           class="catalog-search-input">
+
+    <button type="submit" class="btn btn-primary">Search</button>
+
+    <c:if test="${not empty query}">
+        <a href="${pageContext.request.contextPath}/catalog" class="btn btn-secondary">Clear</a>
+    </c:if>
+</form>
+
+<!-- Genre Filter -->
+<div class="genre-filter">
             <c:url value="/catalog" var="allUrl">
                 <c:param name="page" value="1"/>
             </c:url>
@@ -81,6 +102,9 @@
                         <c:if test="${not empty selectedGenre}">
                             <c:param name="genre" value="${selectedGenre}"/>
                         </c:if>
+                        <c:if test="${not empty query}">
+                                <c:param name="query" value="${query}"/>
+                        </c:if>
                     </c:url>
                     <a href="${prevUrl}">&larr; Previous</a>
                 </c:when>
@@ -97,6 +121,9 @@
                         <c:param name="page" value="${currentPage + 1}"/>
                         <c:if test="${not empty selectedGenre}">
                             <c:param name="genre" value="${selectedGenre}"/>
+                        </c:if>
+                        <c:if test="${not empty query}">
+                                <c:param name="query" value="${query}"/>
                         </c:if>
                     </c:url>
                     <a href="${nextUrl}">Next &rarr;</a>
