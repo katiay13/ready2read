@@ -20,7 +20,8 @@ WORKDIR /app
 COPY ready2read/ .
 
 RUN mkdir -p src/main/resources && \
-    printf 'db.url=jdbc:mysql://db:3306/ready2read\ndb.user=ready2read\ndb.password=ready2read\n' > src/main/resources/db.properties
+    printf 'db.url=jdbc:mysql://db:3306/ready2read\ndb.user=ready2read\ndb.password=ready2read\n' \
+    > src/main/resources/db.properties
 
 RUN mvn clean package -DskipTests
 
