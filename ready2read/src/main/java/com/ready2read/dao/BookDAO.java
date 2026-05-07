@@ -168,6 +168,91 @@ public class BookDAO {
         return genres;
     }
 
+    //search books
+    public List<Book> searchBooks(String query, String genre, int page, int pageSize) {
+        List<Book> books = new ArrayList<>();
+
+        String sql;
+        boolean hasGenre = genre != null && !genre.trim().isEmpty();
+
+        if (hasGenre) {
+            sql = "SELECT * FROM Books WHERE Genre = ? AND " +
+                    "(Title LIKE ? OR Author LIKE ? OR ISBN LIKE ?) " +
+                    "ORDER BY Title LIMIT ? OFFSET ?";
+        } else {
+            sql = "SELECT * FROM Books WHERE " +
+                    "(Title LIKE ? OR Author LIKE ? OR ISBN LIKE ?) " +
+                    "ORDER BY Title LIMIT ? OFFSET ?";
+        }
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            String search = "%" + query + "%";
+            int index = 1;
+
+            if (hasGenre) {
+                stmt.setString(index++, genre);
+            }
+
+            stmt.setString(index++, search);
+            stmt.setString(index++, search);
+            stmt.setString(index++, search);
+            stmt.setInt(index++, pageSize);
+            stmt.setInt(index, (page - 1) * pageSize);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    books.add(mapRow(rs));
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("searchBooks failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return books;
+    }
+
+    //count search results
+    public int getSearchBookCount(String query, String genre) {
+        String sql;
+        boolean hasGenre = genre != null && !genre.trim().isEmpty();
+
+        if (hasGenre) {
+            sql = "SELECT COUNT(*) FROM Books WHERE Genre = ? AND " +
+                    "(Title LIKE ? OR Author LIKE ? OR ISBN LIKE ?)";
+        } else {
+            sql = "SELECT COUNT(*) FROM Books WHERE " +
+                    "(Title LIKE ? OR Author LIKE ? OR ISBN LIKE ?)";
+        }
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            String search = "%" + query + "%";
+            int index = 1;
+
+            if (hasGenre) {
+                stmt.setString(index++, genre);
+            }
+
+            stmt.setString(index++, search);
+            stmt.setString(index++, search);
+            stmt.setString(index, search);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("getSearchBookCount failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        return 0;
+    }
     private Book mapRow(ResultSet rs) throws SQLException {
         return new Book(
             rs.getInt("BookID"),

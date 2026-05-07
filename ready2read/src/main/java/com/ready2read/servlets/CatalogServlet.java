@@ -47,6 +47,9 @@ public class CatalogServlet extends HttpServlet {
         String genre = req.getParameter("genre");
         if (genre != null && genre.trim().isEmpty()) genre = null;
 
+        String query = req.getParameter("query");
+        if (query != null && query.trim().isEmpty()) query = null;
+
         int selectedBookID = 0;
         try {
             String s = req.getParameter("selectedBookID");
@@ -57,7 +60,11 @@ public class CatalogServlet extends HttpServlet {
 
         List<Book> books;
         int totalCount;
-        if (genre == null) {
+        //adding query check
+        if (query != null) {
+            books = bookDAO.searchBooks(query, genre, page, PAGE_SIZE);
+            totalCount = bookDAO.getSearchBookCount(query, genre);
+        } else if (genre == null) {
             books = bookDAO.getAllBooks(page, PAGE_SIZE);
             totalCount = bookDAO.getTotalBookCount();
         } else {
@@ -81,6 +88,7 @@ public class CatalogServlet extends HttpServlet {
         req.setAttribute("currentPage", page);
         req.setAttribute("totalPages", totalPages);
         req.setAttribute("selectedGenre", genre);
+        req.setAttribute("query", query);
         req.setAttribute("selectedBookID", selectedBookID);
         req.setAttribute("activePage", "catalog");
 
