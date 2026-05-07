@@ -284,7 +284,7 @@
                 </div>
                 <div class="form-group">
                     <label for="add-year">Published Year</label>
-                    <input type="number" id="add-year" name="publishedYear">
+                    <input type="number" id="add-year" name="publishedYear" min="1" max="${currentYear}">
                 </div>
                 <div class="form-group">
                     <label for="add-isbn">ISBN</label>
@@ -330,7 +330,7 @@
                 </div>
                 <div class="form-group">
                     <label for="edit-year">Published Year</label>
-                    <input type="number" id="edit-year" name="publishedYear" value="${selectedBook.publishedYear}">
+                    <input type="number" id="edit-year" name="publishedYear" value="${selectedBook.publishedYear}" min="1" max="${currentYear}">
                 </div>
                 <div class="form-group">
                     <label for="edit-isbn">ISBN</label>

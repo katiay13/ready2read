@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.time.Year;
 
 @WebServlet("/admin/books/edit")
 public class AdminBookEditServlet extends HttpServlet {
@@ -46,11 +47,19 @@ public class AdminBookEditServlet extends HttpServlet {
         String currentPage = req.getParameter("currentPage");
         if (currentPage == null || currentPage.trim().isEmpty()) currentPage = "1";
 
+        int currentYear = Year.now().getValue();
         if (title == null || title.trim().isEmpty() || author == null || author.trim().isEmpty()) {
             resp.sendRedirect(req.getContextPath() +
                     "/admin/catalog?page=" + currentPage +
                     "&selectedBookID=" + bookID +
                     "&action=edit&error=Title+and+author+are+required");
+            return;
+        }
+        if (publishedYear < 1 || publishedYear > currentYear) {
+            resp.sendRedirect(req.getContextPath() +
+                    "/admin/catalog?page=" + currentPage +
+                    "&selectedBookID=" + bookID +
+                    "&action=edit&error=Published+year+must+be+between+1+and+" + currentYear);
             return;
         }
 

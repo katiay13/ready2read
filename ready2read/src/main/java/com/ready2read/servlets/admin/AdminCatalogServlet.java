@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.time.Year;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,7 @@ public class AdminCatalogServlet extends HttpServlet {
         req.setAttribute("selectedBookID", selectedBookID);
         req.setAttribute("activePage", "adminCatalog");
         req.setAttribute("action", action);
+        req.setAttribute("currentYear", Year.now().getValue());
 
         if (!"add".equals(action) && selectedBookID > 0) {
             Book selectedBook = bookDAO.getBookByID(selectedBookID);
