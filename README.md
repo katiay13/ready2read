@@ -32,7 +32,7 @@ docker compose up --build
 
 Docker will build the WAR, start MySQL, run `schema.sql` and `seed.sql` automatically, and wait for the database to be healthy before starting the app.
 
-Open `http://localhost:8080` once both containers are up.
+Open `http://localhost:9090` once both containers are up.
 
 ```bash
 docker compose down      # stop and remove containers

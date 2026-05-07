@@ -235,27 +235,24 @@ public class DAOTest {
         ReadingList added = dao.getEntry(1, 1);
         check("addEntry: entry exists after add", added != null);
         check("addEntry: status is want_to_read", added != null && added.getStatus() == ReadingList.Status.WANT_TO_READ);
-        check("addEntry: DateFinished is null for want_to_read", added != null && added.getDateFinished() == null);
 
         if (added != null) {
             int entryID = added.getEntryID();
 
-            // updateStatus → currently_reading (DateFinished should stay null)
+            // updateStatus → currently_reading
             dao.updateStatus(entryID, "currently_reading");
             ReadingList current = dao.getEntry(1, 1);
             check("updateStatus to currently_reading", current != null && current.getStatus() == ReadingList.Status.CURRENTLY_READING);
-            check("updateStatus non-finished: DateFinished is null", current != null && current.getDateFinished() == null);
 
-            // updateStatus → finished (DateFinished should be set)
+            // updateStatus → finished
             dao.updateStatus(entryID, "finished");
             ReadingList finished = dao.getEntry(1, 1);
             check("updateStatus to finished", finished != null && finished.getStatus() == ReadingList.Status.FINISHED);
-            check("updateStatus finished: DateFinished is set", finished != null && finished.getDateFinished() != null);
 
-            // updateStatus back to want_to_read (DateFinished should clear)
+            // updateStatus back to want_to_read
             dao.updateStatus(entryID, "want_to_read");
             ReadingList cleared = dao.getEntry(1, 1);
-            check("updateStatus back to want_to_read: DateFinished cleared", cleared != null && cleared.getDateFinished() == null);
+            check("updateStatus back to want_to_read", cleared != null && cleared.getStatus() == ReadingList.Status.WANT_TO_READ);
 
             // removeEntry
             dao.removeEntry(entryID);

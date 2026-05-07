@@ -65,9 +65,7 @@ public class ReadingListDAO {
     }
 
     public void updateStatus(int entryID, String status) {
-        String sql = "finished".equals(status)
-            ? "UPDATE ReadingList SET Status = ?, DateFinished = NOW() WHERE EntryID = ?"
-            : "UPDATE ReadingList SET Status = ?, DateFinished = NULL WHERE EntryID = ?";
+        String sql = "UPDATE ReadingList SET Status = ? WHERE EntryID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, status);
@@ -100,14 +98,12 @@ public class ReadingListDAO {
                 break;
             }
         }
-        Timestamp dateFinished = rs.getTimestamp("DateFinished");
         return new ReadingList(
             rs.getInt("EntryID"),
             rs.getInt("UserID"),
             rs.getInt("BookID"),
             status,
-            rs.getTimestamp("DateAdded").toLocalDateTime(),
-            dateFinished != null ? dateFinished.toLocalDateTime() : null
+            rs.getTimestamp("DateAdded").toLocalDateTime()
         );
     }
 }
