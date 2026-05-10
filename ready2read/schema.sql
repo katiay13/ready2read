@@ -12,9 +12,7 @@ CREATE TABLE Users (
     Email       VARCHAR(100) NOT NULL UNIQUE,
     Password    VARCHAR(255) NOT NULL,
     Role        ENUM('admin', 'user') NOT NULL DEFAULT 'user',
-    JoinDate    DATE         NOT NULL DEFAULT (CURRENT_DATE),
-    ProfileBio  VARCHAR(2000) NOT NULL DEFAULT '',
-    AvatarURL   VARCHAR(255) NOT NULL DEFAULT ''
+    JoinDate    DATE         NOT NULL DEFAULT (CURRENT_DATE)
 );
 
 CREATE TABLE Books (

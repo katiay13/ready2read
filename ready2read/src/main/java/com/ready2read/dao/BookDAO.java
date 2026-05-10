@@ -154,6 +154,22 @@ public class BookDAO {
         return 0;
     }
 
+    public boolean isbnExists(String isbn, int excludeBookID) {
+        String sql = "SELECT COUNT(*) FROM Books WHERE ISBN = ? AND BookID != ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, isbn);
+            stmt.setInt(2, excludeBookID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            System.err.println("isbnExists failed: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+
     public List<String> getAllGenres() {
         List<String> genres = new ArrayList<>();
         String sql = "SELECT DISTINCT Genre FROM Books WHERE Genre IS NOT NULL ORDER BY Genre";

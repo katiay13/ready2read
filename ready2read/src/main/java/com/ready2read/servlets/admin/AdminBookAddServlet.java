@@ -47,9 +47,24 @@ public class AdminBookAddServlet extends HttpServlet {
                     "/admin/catalog?action=add&error=Title+and+author+are+required");
             return;
         }
+        if (genre == null || genre.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() +
+                    "/admin/catalog?action=add&error=Genre+is+required");
+            return;
+        }
         if (publishedYear < 1 || publishedYear > currentYear) {
             resp.sendRedirect(req.getContextPath() +
                     "/admin/catalog?action=add&error=Published+year+must+be+between+1+and+" + currentYear);
+            return;
+        }
+        if (isbn == null || isbn.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() +
+                    "/admin/catalog?action=add&error=ISBN+is+required");
+            return;
+        }
+        if (bookDAO.isbnExists(isbn.trim(), 0)) {
+            resp.sendRedirect(req.getContextPath() +
+                    "/admin/catalog?action=add&error=A+book+with+that+ISBN+already+exists");
             return;
         }
 

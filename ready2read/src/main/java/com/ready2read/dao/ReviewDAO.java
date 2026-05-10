@@ -63,14 +63,15 @@ public class ReviewDAO {
         }
     }
 
-    public void updateReview(Review review) {
+    public void updateReview(Review review, int userID) {
         String sql = "UPDATE Reviews SET Rating = ?, ReviewText = ?, DateModified = NOW() " +
-                     "WHERE ReviewID = ?";
+                     "WHERE ReviewID = ? AND UserID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, review.getRating());
             stmt.setString(2, review.getReviewText());
             stmt.setInt(3, review.getReviewID());
+            stmt.setInt(4, userID);
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("updateReview failed: " + e.getMessage());
@@ -78,11 +79,12 @@ public class ReviewDAO {
         }
     }
 
-    public void deleteReview(int reviewID) {
-        String sql = "DELETE FROM Reviews WHERE ReviewID = ?";
+    public void deleteReview(int reviewID, int userID) {
+        String sql = "DELETE FROM Reviews WHERE ReviewID = ? AND UserID = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, reviewID);
+            stmt.setInt(2, userID);
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("deleteReview failed: " + e.getMessage());
@@ -113,7 +115,6 @@ public class ReviewDAO {
     }
 
     private Review mapRow(ResultSet rs) throws SQLException {
-        Timestamp modified = rs.getTimestamp("DateModified");
         return new Review(
             rs.getInt("ReviewID"),
             rs.getInt("UserID"),
@@ -121,7 +122,7 @@ public class ReviewDAO {
             rs.getInt("Rating"),
             rs.getString("ReviewText"),
             rs.getTimestamp("DateCreated").toLocalDateTime(),
-            modified != null ? modified.toLocalDateTime() : null
+            rs.getTimestamp("DateModified").toLocalDateTime()
         );
     }
 }

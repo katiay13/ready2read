@@ -132,6 +132,27 @@
             border-color: #3d6b4f;
         }
 
+        select.genre-select {
+            width: 100%;
+            padding: 0.5rem 0.7rem;
+            font-size: 0.88rem;
+            font-family: Georgia, serif;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+            color: #2c2c2c;
+            cursor: pointer;
+        }
+
+        select.genre-select:focus {
+            outline: none;
+            border-color: #3d6b4f;
+        }
+
+        .genre-new-input {
+            margin-top: 0.5rem;
+        }
+
         .panel-form-actions {
             display: flex;
             gap: 0.5rem;
@@ -279,8 +300,17 @@
                     <input type="text" id="add-author" name="author">
                 </div>
                 <div class="form-group">
-                    <label for="add-genre">Genre</label>
-                    <input type="text" id="add-genre" name="genre">
+                    <label for="add-genre-select">Genre</label>
+                    <select id="add-genre-select" class="genre-select" onchange="handleGenreChange('add')">
+                        <option value="">— Select a genre —</option>
+                        <c:forEach var="g" items="${genres}">
+                            <option value="<c:out value="${g}"/>"><c:out value="${g}"/></option>
+                        </c:forEach>
+                        <option value="__new__">+ Add new genre</option>
+                    </select>
+                    <input type="hidden" id="add-genre-val" name="genre">
+                    <input type="text" id="add-genre-text" class="genre-new-input"
+                           placeholder="Enter new genre name" style="display:none;">
                 </div>
                 <div class="form-group">
                     <label for="add-year">Published Year</label>
@@ -325,8 +355,17 @@
                     <input type="text" id="edit-author" name="author" value="<c:out value="${selectedBook.author}"/>">
                 </div>
                 <div class="form-group">
-                    <label for="edit-genre">Genre</label>
-                    <input type="text" id="edit-genre" name="genre" value="<c:out value="${selectedBook.genre}"/>">
+                    <label for="edit-genre-select">Genre</label>
+                    <select id="edit-genre-select" class="genre-select" onchange="handleGenreChange('edit')">
+                        <option value="">— Select a genre —</option>
+                        <c:forEach var="g" items="${genres}">
+                            <option value="<c:out value="${g}"/>" <c:if test="${g == selectedBook.genre}">selected</c:if>><c:out value="${g}"/></option>
+                        </c:forEach>
+                        <option value="__new__">+ Add new genre</option>
+                    </select>
+                    <input type="hidden" id="edit-genre-val" name="genre" value="<c:out value="${selectedBook.genre}"/>">
+                    <input type="text" id="edit-genre-text" class="genre-new-input"
+                           placeholder="Enter new genre name" style="display:none;">
                 </div>
                 <div class="form-group">
                     <label for="edit-year">Published Year</label>
@@ -485,6 +524,24 @@
     </c:if>
 
 </div>
+
+<script>
+    function handleGenreChange(prefix) {
+        const select  = document.getElementById(prefix + '-genre-select');
+        const hidden  = document.getElementById(prefix + '-genre-val');
+        const text    = document.getElementById(prefix + '-genre-text');
+
+        if (select.value === '__new__') {
+            text.style.display = '';
+            text.focus();
+            hidden.value = '';
+            text.oninput = () => { hidden.value = text.value.trim(); };
+        } else {
+            text.style.display = 'none';
+            hidden.value = select.value;
+        }
+    }
+</script>
 
 </body>
 </html>

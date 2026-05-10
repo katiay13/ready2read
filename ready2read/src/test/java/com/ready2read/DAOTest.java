@@ -38,7 +38,7 @@ public class DAOTest {
 
         // getAllBooks page 1
         List<Book> page1 = dao.getAllBooks(1, 10);
-        check("getAllBooks(1,10) returns 5 books", page1.size() == 5);
+        check("getAllBooks(1,10) returns 10 books", page1.size() == 10);
         if (!page1.isEmpty())
             System.out.println("  first title (alpha): " + page1.get(0).getTitle());
 
@@ -51,36 +51,36 @@ public class DAOTest {
 
         // getBooksByGenre
         List<Book> fiction = dao.getBooksByGenre("Fiction", 1, 10);
-        check("getBooksByGenre('Fiction') returns 2", fiction.size() == 2);
+        check("getBooksByGenre('Fiction') returns 8", fiction.size() == 8);
         List<Book> noGenre = dao.getBooksByGenre("NoSuchGenre", 1, 10);
         check("getBooksByGenre unknown returns empty list (not null)", noGenre != null && noGenre.isEmpty());
 
         // getBookByID
         Book b1 = dao.getBookByID(1);
-        check("getBookByID(1) is '1984'", b1 != null && "1984".equals(b1.getTitle()));
+        check("getBookByID(1) is 'The Great Gatsby'", b1 != null && "The Great Gatsby".equals(b1.getTitle()));
         Book missing = dao.getBookByID(99999);
         check("getBookByID(99999) returns null", missing == null);
 
-        // getAverageRating — seed: book 1 has ratings 5 and 4 → avg 4.5
+        // getAverageRating — seed: book 1 has ratings 4 and 5 → avg 4.5
         double avg1 = dao.getAverageRating(1);
         check("getAverageRating(1) == 4.5", avg1 == 4.5);
         double avgNone = dao.getAverageRating(2);
-        // book 2 has one rating of 4 from seed
-        check("getAverageRating(2) == 4.0", avgNone == 4.0);
+        // book 2 has ratings 5 and 4 from seed → avg 4.5
+        check("getAverageRating(2) == 4.5", avgNone == 4.5);
         double avgMissing = dao.getAverageRating(99999);
         check("getAverageRating(no reviews) == 0.0", avgMissing == 0.0);
 
         // counts
         int total = dao.getTotalBookCount();
-        check("getTotalBookCount() == 5", total == 5);
+        check("getTotalBookCount() == 25", total == 25);
         int fictionCount = dao.getTotalBookCountByGenre("Fiction");
-        check("getTotalBookCountByGenre('Fiction') == 2", fictionCount == 2);
+        check("getTotalBookCountByGenre('Fiction') == 8", fictionCount == 8);
         int noneCount = dao.getTotalBookCountByGenre("NoSuchGenre");
         check("getTotalBookCountByGenre unknown == 0", noneCount == 0);
 
         // getAllGenres
         List<String> genres = dao.getAllGenres();
-        check("getAllGenres() returns 3 genres", genres.size() == 3);
+        check("getAllGenres() returns 9 genres", genres.size() == 9);
         check("getAllGenres() sorted — first is 'Dystopian'", "Dystopian".equals(genres.get(0)));
 
         // addBook / getBookByID / updateBook / deleteBook round-trip
@@ -88,7 +88,7 @@ public class DAOTest {
         dao.addBook(testBook);
         List<Book> afterAdd = dao.getAllBooks(1, 100);
         int newTotal = dao.getTotalBookCount();
-        check("addBook increases count to 6", newTotal == 6);
+        check("addBook increases count to 26", newTotal == 26);
         Book found = afterAdd.stream().filter(b -> "Test Title".equals(b.getTitle())).findFirst().orElse(null);
         check("addBook: new book retrievable via getAllBooks", found != null);
 
@@ -106,7 +106,7 @@ public class DAOTest {
             // deleteBook
             dao.deleteBook(newID);
             check("deleteBook removes book", dao.getBookByID(newID) == null);
-            check("getTotalBookCount back to 5 after delete", dao.getTotalBookCount() == 5);
+            check("getTotalBookCount back to 25 after delete", dao.getTotalBookCount() == 25);
         }
     }
 
@@ -118,26 +118,26 @@ public class DAOTest {
         UserDAO dao = new UserDAO();
 
         // login — valid
-        User u = dao.login("purpleturtle", "hashed_password");
+        User u = dao.login("bookworm42", "password123");
         check("login valid credentials returns User", u != null);
-        check("login returns correct username", u != null && "purpleturtle".equals(u.getUsername()));
+        check("login returns correct username", u != null && "bookworm42".equals(u.getUsername()));
         check("login populates role", u != null && u.getRole() != null && !u.getRole().isEmpty());
 
         // login — invalid
-        User bad = dao.login("purpleturtle", "wrongpassword");
+        User bad = dao.login("bookworm42", "wrongpassword");
         check("login bad password returns null", bad == null);
         User badUser = dao.login("nobody", "anything");
         check("login unknown user returns null", badUser == null);
 
         // usernameExists / emailExists
-        check("usernameExists existing", dao.usernameExists("purpleturtle"));
+        check("usernameExists existing", dao.usernameExists("bookworm42"));
         check("usernameExists non-existent", !dao.usernameExists("__notauser__"));
-        check("emailExists existing", dao.emailExists("john@email.com"));
+        check("emailExists existing", dao.emailExists("bookworm42@mail.com"));
         check("emailExists non-existent", !dao.emailExists("__nobody@nowhere.invalid__"));
 
         // registerUser + deleteUser round-trip
         String tmpName = "tmpuser_" + System.currentTimeMillis();
-        User newUser = new User(0, tmpName, tmpName + "@test.invalid", "testpass123", "user", null, null, null);
+        User newUser = new User(0, tmpName, tmpName + "@test.invalid", "testpass123", "user", null);
         dao.registerUser(newUser);
         check("registerUser: usernameExists after register", dao.usernameExists(tmpName));
 
@@ -176,7 +176,7 @@ public class DAOTest {
         check("getReviewsByBook returns non-null list for unknown book", dao.getReviewsByBook(99999) != null);
         check("getReviewsByBook returns empty list for unknown book", dao.getReviewsByBook(99999).isEmpty());
 
-        // getReviewsByUser — user 2 (purpleturtle) has 3 seed reviews
+        // getReviewsByUser — user 2 (bookworm42) has 3 seed reviews
         List<Review> user2Reviews = dao.getReviewsByUser(2);
         check("getReviewsByUser(2) returns 3 reviews", user2Reviews.size() == 3);
         check("getReviewsByUser populates bookTitle", user2Reviews.stream().allMatch(r -> r.getBookTitle() != null));
@@ -198,13 +198,13 @@ public class DAOTest {
         if (added != null) {
             // updateReview
             Review updated = new Review(added.getReviewID(), 1, 2, 5, "Updated admin review", null, null);
-            dao.updateReview(updated);
+            dao.updateReview(updated, 1);
             Review afterUpdate = dao.getReviewByUserAndBook(1, 2);
             check("updateReview: rating changed to 5", afterUpdate != null && afterUpdate.getRating() == 5);
             check("updateReview: DateModified is now set", afterUpdate != null && afterUpdate.getDateModified() != null);
 
             // deleteReview
-            dao.deleteReview(afterUpdate.getReviewID());
+            dao.deleteReview(afterUpdate.getReviewID(), 1);
             check("deleteReview: review gone after delete", dao.getReviewByUserAndBook(1, 2) == null);
         }
     }
@@ -216,7 +216,7 @@ public class DAOTest {
         System.out.println("\n=== ReadingListDAO ===");
         ReadingListDAO dao = new ReadingListDAO();
 
-        // getReadingListByUser — user 2 (purpleturtle) has 4 seed entries
+        // getReadingListByUser — user 2 (bookworm42) has 4 seed entries
         List<ReadingList> user2List = dao.getReadingListByUser(2);
         check("getReadingListByUser(2) returns 4 entries", user2List.size() == 4);
         check("getReadingListByUser populates bookTitle", user2List.stream().allMatch(e -> e.getBookTitle() != null));

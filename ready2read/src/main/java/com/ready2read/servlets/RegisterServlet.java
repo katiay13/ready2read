@@ -58,7 +58,7 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        User newUser = new User(0, username.trim(), email.trim(), password, "user", null, null, null);
+        User newUser = new User(0, username.trim(), email.trim(), password, "user", null);
         userDAO.registerUser(newUser);
 
         req.setAttribute("success", "Account created! Please sign in.");

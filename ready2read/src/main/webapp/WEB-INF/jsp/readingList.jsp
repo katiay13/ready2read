@@ -182,6 +182,12 @@
         <div class="detail-section">
             <h3 class="detail-section-title">Reviews</h3>
 
+            <% String reviewError = (String) session.getAttribute("reviewError");
+               if (reviewError != null) { session.removeAttribute("reviewError"); } %>
+            <% if (reviewError != null) { %>
+                <p style="color:#c0392b; font-size:0.875rem; margin-bottom:0.75rem;"><%= reviewError %></p>
+            <% } %>
+
             <c:forEach var="review" items="${bookReviews}">
                 <c:choose>
                     <c:when test="${review.userID == sessionScope.userID}">
@@ -217,7 +223,7 @@
                                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                 </form>
                             </div>
-                            <div id="editForm-${review.reviewID}" class="edit-form">
+                            <div id="editForm-${review.reviewID}" class="edit-form" style="display:none;">
                                 <form method="post"
                                       action="${pageContext.request.contextPath}/reviews/update">
                                     <input type="hidden" name="reviewID"       value="${review.reviewID}">

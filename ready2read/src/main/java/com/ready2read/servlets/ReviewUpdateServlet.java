@@ -27,6 +27,7 @@ public class ReviewUpdateServlet extends HttpServlet {
             return;
         }
 
+        int userID = (Integer) session.getAttribute("userID");
         int reviewID = Integer.parseInt(req.getParameter("reviewID"));
         int rating = Integer.parseInt(req.getParameter("rating"));
         String reviewText = req.getParameter("reviewText");
@@ -54,11 +55,12 @@ public class ReviewUpdateServlet extends HttpServlet {
         }
 
         if (reviewText == null || reviewText.trim().isEmpty()) {
+            req.getSession().setAttribute("reviewError", "Review text cannot be empty.");
             resp.sendRedirect(redirectURL);
             return;
         }
 
-        reviewDAO.updateReview(new Review(reviewID, 0, 0, rating, reviewText.trim(), null, null));
+        reviewDAO.updateReview(new Review(reviewID, 0, 0, rating, reviewText.trim(), null, null), userID);
 
         resp.sendRedirect(redirectURL);
     }

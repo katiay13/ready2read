@@ -10,22 +10,22 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ============================================================
 -- USERS  (1 admin + 14 regular users = 15 rows)
 -- ============================================================
-INSERT INTO Users (Username, Email, Password, Role, JoinDate, ProfileBio, AvatarURL) VALUES
-('admin',        'admin@ready2read.com',     'admin123',    'admin', '2024-01-01', 'Platform administrator.',                           'https://api.dicebear.com/7.x/initials/svg?seed=Admin'),
-('bookworm42',   'bookworm42@mail.com',      'password123', 'user',  '2024-02-14', 'Reading is my cardio.',                             'https://api.dicebear.com/7.x/initials/svg?seed=bookworm42'),
-('pageturer',    'pageturer@mail.com',       'password123', 'user',  '2024-03-05', 'Always 5 books deep into a reading list.',          'https://api.dicebear.com/7.x/initials/svg?seed=pageturer'),
-('litlover',     'litlover@mail.com',        'password123', 'user',  '2024-03-20', 'Classic literature and strong tea.',                'https://api.dicebear.com/7.x/initials/svg?seed=litlover'),
-('readingqueen', 'readingqueen@mail.com',    'password123', 'user',  '2024-04-11', 'Fantasy and sci-fi are my happy place.',            'https://api.dicebear.com/7.x/initials/svg?seed=readingqueen'),
-('novelseeker',  'novelseeker@mail.com',     'password123', 'user',  '2024-04-28', 'Looking for my next favourite book every day.',     'https://api.dicebear.com/7.x/initials/svg?seed=novelseeker'),
-('classicfan',   'classicfan@mail.com',      'password123', 'user',  '2024-05-15', 'Nineteenth century fiction is underrated.',         'https://api.dicebear.com/7.x/initials/svg?seed=classicfan'),
-('scifiguru',    'scifiguru@mail.com',       'password123', 'user',  '2024-06-01', 'Hard sci-fi, space opera, all of it.',              'https://api.dicebear.com/7.x/initials/svg?seed=scifiguru'),
-('thrillerreader','thrillerreader@mail.com', 'password123', 'user',  '2024-06-22', 'I read thrillers so fast my library card is worn.', 'https://api.dicebear.com/7.x/initials/svg?seed=thrillerreader'),
-('mysterymaniac','mysterymaniac@mail.com',   'password123', 'user',  '2024-07-08', 'The butler always did it.',                         'https://api.dicebear.com/7.x/initials/svg?seed=mysterymaniac'),
-('fantasylover', 'fantasylover@mail.com',    'password123', 'user',  '2024-07-30', 'Give me dragons, magic, and chosen ones.',          'https://api.dicebear.com/7.x/initials/svg?seed=fantasylover'),
-('romancereader','romancereader@mail.com',   'password123', 'user',  '2024-08-19', 'HEAs only, please.',                                'https://api.dicebear.com/7.x/initials/svg?seed=romancereader'),
-('dystopiadave', 'dystopiadave@mail.com',    'password123', 'user',  '2024-09-03', 'Dystopian fiction hits different after the news.', 'https://api.dicebear.com/7.x/initials/svg?seed=dystopiadave'),
-('nightreader',  'nightreader@mail.com',     'password123', 'user',  '2024-10-17', 'I read past midnight every single night.',          'https://api.dicebear.com/7.x/initials/svg?seed=nightreader'),
-('wordsmith99',  'wordsmith99@mail.com',     'password123', 'user',  '2025-01-06', 'Amateur writer, full-time reader.',                 'https://api.dicebear.com/7.x/initials/svg?seed=wordsmith99');
+INSERT INTO Users (Username, Email, Password, Role, JoinDate) VALUES
+('admin',         'admin@ready2read.com',     'admin123',    'admin', '2024-01-01'),
+('bookworm42',    'bookworm42@mail.com',      'password123', 'user',  '2024-02-14'),
+('pageturer',     'pageturer@mail.com',       'password123', 'user',  '2024-03-05'),
+('litlover',      'litlover@mail.com',        'password123', 'user',  '2024-03-20'),
+('readingqueen',  'readingqueen@mail.com',    'password123', 'user',  '2024-04-11'),
+('novelseeker',   'novelseeker@mail.com',     'password123', 'user',  '2024-04-28'),
+('classicfan',    'classicfan@mail.com',      'password123', 'user',  '2024-05-15'),
+('scifiguru',     'scifiguru@mail.com',       'password123', 'user',  '2024-06-01'),
+('thrillerreader','thrillerreader@mail.com',  'password123', 'user',  '2024-06-22'),
+('mysterymaniac', 'mysterymaniac@mail.com',   'password123', 'user',  '2024-07-08'),
+('fantasylover',  'fantasylover@mail.com',    'password123', 'user',  '2024-07-30'),
+('romancereader', 'romancereader@mail.com',   'password123', 'user',  '2024-08-19'),
+('dystopiadave',  'dystopiadave@mail.com',    'password123', 'user',  '2024-09-03'),
+('nightreader',   'nightreader@mail.com',     'password123', 'user',  '2024-10-17'),
+('wordsmith99',   'wordsmith99@mail.com',     'password123', 'user',  '2025-01-06');
 
 -- ============================================================
 -- BOOKS  (15 rows)

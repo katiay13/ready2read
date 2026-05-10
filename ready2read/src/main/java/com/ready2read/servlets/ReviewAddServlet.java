@@ -53,6 +53,7 @@ public class ReviewAddServlet extends HttpServlet {
         }
 
         if (reviewText == null || reviewText.trim().isEmpty()) {
+            req.getSession().setAttribute("reviewError", "Review text cannot be empty.");
             resp.sendRedirect(redirectURL);
             return;
         }

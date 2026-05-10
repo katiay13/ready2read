@@ -116,9 +116,7 @@ public class UserDAO {
             rs.getString("Email"),
             rs.getString("Password"),
             rs.getString("Role"),
-            joinDate != null ? joinDate.toLocalDate() : null,
-            rs.getString("ProfileBio"),
-            rs.getString("AvatarURL")
+            joinDate != null ? joinDate.toLocalDate() : null
         );
     }
 }

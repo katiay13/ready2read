@@ -21,6 +21,12 @@
     <div class="catalog-area">
         <h2 class="page-title">My Ratings &amp; Reviews</h2>
 
+        <% String reviewError = (String) session.getAttribute("reviewError");
+           if (reviewError != null) { session.removeAttribute("reviewError"); } %>
+        <% if (reviewError != null) { %>
+            <p style="color:#c0392b; font-size:0.875rem; margin-bottom:0.75rem;"><%= reviewError %></p>
+        <% } %>
+
         <c:choose>
             <c:when test="${empty reviews}">
                 <p class="empty-list-msg">
@@ -49,7 +55,7 @@
                         <div class="review-meta">
                             <span>
                                 ${formattedDates[review.reviewID]}
-                                <c:if test="${review.dateModified != null}">
+                                <c:if test="${review.edited}">
                                     <em style="color:#999;">(edited)</em>
                                 </c:if>
                             </span>
@@ -67,7 +73,7 @@
                             </div>
                         </div>
 
-                        <div id="editForm-${review.reviewID}" class="edit-form">
+                        <div id="editForm-${review.reviewID}" class="edit-form" style="display:none;">
                             <form method="post"
                                   action="${pageContext.request.contextPath}/reviews/update">
                                 <input type="hidden" name="reviewID" value="${review.reviewID}">

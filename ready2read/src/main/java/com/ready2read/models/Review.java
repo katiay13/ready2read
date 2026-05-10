@@ -35,6 +35,10 @@ public class Review {
     public String getUsername()                 { return username; }
     public String getBookTitle()                { return bookTitle; }
 
+    public boolean isEdited() {
+        return dateCreated != null && dateModified != null && dateModified.isAfter(dateCreated);
+    }
+
     public void setRating(int rating)               { this.rating       = rating; }
     public void setReviewText(String reviewText)     { this.reviewText   = reviewText; }
     public void setDateModified(LocalDateTime date)  { this.dateModified = date; }

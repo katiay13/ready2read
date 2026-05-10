@@ -55,11 +55,32 @@ public class AdminBookEditServlet extends HttpServlet {
                     "&action=edit&error=Title+and+author+are+required");
             return;
         }
+        if (genre == null || genre.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() +
+                    "/admin/catalog?page=" + currentPage +
+                    "&selectedBookID=" + bookID +
+                    "&action=edit&error=Genre+is+required");
+            return;
+        }
         if (publishedYear < 1 || publishedYear > currentYear) {
             resp.sendRedirect(req.getContextPath() +
                     "/admin/catalog?page=" + currentPage +
                     "&selectedBookID=" + bookID +
                     "&action=edit&error=Published+year+must+be+between+1+and+" + currentYear);
+            return;
+        }
+        if (isbn == null || isbn.trim().isEmpty()) {
+            resp.sendRedirect(req.getContextPath() +
+                    "/admin/catalog?page=" + currentPage +
+                    "&selectedBookID=" + bookID +
+                    "&action=edit&error=ISBN+is+required");
+            return;
+        }
+        if (bookDAO.isbnExists(isbn.trim(), bookID)) {
+            resp.sendRedirect(req.getContextPath() +
+                    "/admin/catalog?page=" + currentPage +
+                    "&selectedBookID=" + bookID +
+                    "&action=edit&error=A+book+with+that+ISBN+already+exists");
             return;
         }
 

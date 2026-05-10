@@ -26,13 +26,14 @@ public class ReviewDeleteServlet extends HttpServlet {
             return;
         }
 
+        int userID = (Integer) session.getAttribute("userID");
         int reviewID = Integer.parseInt(req.getParameter("reviewID"));
         String page = req.getParameter("currentPage");
         String genre = req.getParameter("selectedGenre");
         String selectedBookID = req.getParameter("selectedBookID");
         String source = req.getParameter("source");
 
-        reviewDAO.deleteReview(reviewID);
+        reviewDAO.deleteReview(reviewID, userID);
 
         if ("myReviews".equals(source)) {
             resp.sendRedirect(req.getContextPath() + "/my-reviews");

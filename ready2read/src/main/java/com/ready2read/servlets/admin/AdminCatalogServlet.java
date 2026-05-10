@@ -61,8 +61,11 @@ public class AdminCatalogServlet extends HttpServlet {
         String action = req.getParameter("action");
         if (action == null) action = "";
 
+        List<String> genres = bookDAO.getAllGenres();
+
         req.setAttribute("books", books);
         req.setAttribute("bookRatings", bookRatings);
+        req.setAttribute("genres", genres);
         req.setAttribute("currentPage", page);
         req.setAttribute("totalPages", totalPages);
         req.setAttribute("selectedBookID", selectedBookID);
