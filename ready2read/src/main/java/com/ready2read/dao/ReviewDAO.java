@@ -9,6 +9,10 @@ import java.util.List;
 
 public class ReviewDAO {
 
+    /**
+     * Fetches all reviews for a book, newest first, and the reviewer's username.
+     * JOIN fetches usernames in one query instead of one extra query per review.
+     */
     public List<Review> getReviewsByBook(int bookID) {
         List<Review> reviews = new ArrayList<>();
         String sql = "SELECT r.*, u.Username FROM Reviews r " +
@@ -20,6 +24,7 @@ public class ReviewDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Review review = mapRow(rs);
+                    // Username comes from the JOIN and is not in the base Review columns.
                     review.setUsername(rs.getString("Username"));
                     reviews.add(review);
                 }
@@ -31,6 +36,12 @@ public class ReviewDAO {
         return reviews;
     }
 
+    /**
+     * Looks up a user's existing review for a specific book.
+     * Used to determine whether to show an "Add Review" or "Edit Review" form,
+     * and to enforce the one-review-per-user-per-book constraint before inserting.
+     * Returns null if the user has not yet reviewed this book.
+     */
     public Review getReviewByUserAndBook(int userID, int bookID) {
         String sql = "SELECT * FROM Reviews WHERE UserID = ? AND BookID = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -47,6 +58,10 @@ public class ReviewDAO {
         return null;
     }
 
+    /**
+     * Inserts a new review. DateCreated is set server-side via NOW()
+     * so it reflects the database server's clock consistently.
+     */
     public void addReview(Review review) {
         String sql = "INSERT INTO Reviews (UserID, BookID, Rating, ReviewText, DateCreated) " +
                      "VALUES (?, ?, ?, ?, NOW())";
@@ -63,6 +78,11 @@ public class ReviewDAO {
         }
     }
 
+    /**
+     * Updates a review's content and stamps DateModified.
+     * The WHERE clause includes AND UserID = ? so a user cannot edit another
+     * user's review even if they supply a valid ReviewID.
+     */
     public void updateReview(Review review, int userID) {
         String sql = "UPDATE Reviews SET Rating = ?, ReviewText = ?, DateModified = NOW() " +
                      "WHERE ReviewID = ? AND UserID = ?";
@@ -79,6 +99,10 @@ public class ReviewDAO {
         }
     }
 
+    /**
+     * Deletes a review. AND UserID = ? enforces ownership at the database level,
+     * the same reason as in updateReview.
+     */
     public void deleteReview(int reviewID, int userID) {
         String sql = "DELETE FROM Reviews WHERE ReviewID = ? AND UserID = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -92,6 +116,10 @@ public class ReviewDAO {
         }
     }
 
+    /**
+     * Fetches all reviews written by a user, including each book's title.
+     * The JOIN avoids a separate lookup per review for the book title.
+     */
     public List<Review> getReviewsByUser(int userID) {
         List<Review> reviews = new ArrayList<>();
         String sql = "SELECT r.*, b.Title FROM Reviews r " +
@@ -103,6 +131,7 @@ public class ReviewDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Review review = mapRow(rs);
+                    // Title comes from the Books JOIN, not the base Reviews columns.
                     review.setBookTitle(rs.getString("Title"));
                     reviews.add(review);
                 }
@@ -114,6 +143,7 @@ public class ReviewDAO {
         return reviews;
     }
 
+    /** Converts a DB row to a Review object. DateModified defaults to the creation time if never edited. */
     private Review mapRow(ResultSet rs) throws SQLException {
         return new Review(
             rs.getInt("ReviewID"),
