@@ -30,7 +30,7 @@ A Goodreads-inspired web application built with Java Servlets, JSP, and MySQL.
 docker compose up --build
 ```
 
-Docker will build the WAR, start MySQL, run `schema.sql` and `seed.sql` automatically, and wait for the database to be healthy before starting the app.
+Docker will build the WAR, start MySQL, run `create_schema.sql` and `initialize_data.sql` automatically, and wait for the database to be healthy before starting the app.
 
 Open `http://localhost:9090` once both containers are up.
 
@@ -52,11 +52,11 @@ docker compose down -v   # also wipe the database volume (fresh start)
 ### Database
 
 ```bash
-mysql -u root -p < ready2read/schema.sql
-mysql -u root -p < ready2read/seed.sql
+mysql -u root -p < ready2read/create_schema.sql
+mysql -u root -p < ready2read/initialize_data.sql
 ```
 
-Schema reference: ![ER Diagram](docs/er_diagram.png)
+Schema reference: ![ER Diagram](docs/EER_Updated_1.png)
 
 ### App
 
@@ -85,8 +85,8 @@ Schema reference: ![ER Diagram](docs/er_diagram.png)
 
 ```
 ready2read/
-├── schema.sql                   # DDL — creates all tables
-├── seed.sql                     # Sample data
+├── create_schema.sql            # DDL — creates all tables
+├── initialize_data.sql          # Sample data
 └── src/main/
     ├── java/com/ready2read/
     │   ├── dao/                 # Data access (BookDAO, ReviewDAO, ReadingListDAO, UserDAO)

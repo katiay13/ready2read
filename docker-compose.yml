@@ -8,8 +8,8 @@ services:
       MYSQL_PASSWORD: ready2read
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./ready2read/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-      - ./ready2read/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+      - ./ready2read/create_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./ready2read/initialize_data.sql:/docker-entrypoint-initdb.d/02-seed.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "ready2read", "-pready2read"]
       interval: 10s
